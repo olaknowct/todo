@@ -12,6 +12,7 @@ export default function TodoList() {
   const [_showEditModal, setShowEditModal] = useAtom(editModalAtom);
   const [_, setEditTodo] = useAtom(editTodoAtom);
   const router = useRouter();
+  const isAuthenticated = currentUser && currentUser.name;
   const handleDelete = (AddToDo: any) => {
     const newTodos = currentUser.todos.filter((todo) => todo !== AddToDo);
     setCurrentUser({ ...currentUser, todos: [...newTodos] });
@@ -22,9 +23,9 @@ export default function TodoList() {
     setShowEditModal(true);
   };
 
-  // useEffect(() => {
-  // if (!(currentUser && currentUser.name)) router.push("/");
-  // }, [currentUser, router]);
+  useEffect(() => {
+    if (!isAuthenticated) router.push("/");
+  }, [currentUser, router]);
 
   return (
     <>
