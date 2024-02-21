@@ -1,15 +1,16 @@
-"use client";
-import { initialAddFormData } from "@/data/constants";
-import { userData } from "@/data/user";
-import { editModalAtom, editTodoAtom, userAtom } from "@/lib/jotai/atom";
-import { useAtom } from "jotai";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+'use client';
+import { initialAddFormData } from '@/data/constants';
+import { userData } from '@/data/user';
+import { editModalAtom, editTodoAtom, fakeUserDataAtom, userAtom } from '@/lib/jotai/atom';
+import { useAtom } from 'jotai';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 function EditTodoModal() {
   const [showEditModal, setShowEditModal] = useAtom(editModalAtom);
   const [currentUser, setCurrentUser] = useAtom(userAtom);
   const [editTodo] = useAtom(editTodoAtom);
+  const [fakeUserData, setFakeUserData] = useAtom(fakeUserDataAtom);
   const [editFormData, setEditFormData] = useState<EditFormData>({ name: editTodo });
 
   const router = useRouter();
@@ -18,11 +19,17 @@ function EditTodoModal() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const user = userData.find((user) => user.username === currentUser.username);
-    if (!user) return router.push("/");
+    if (!user) return router.push('/');
     const newTodos = currentUser.todos.map((todo) =>
       todo === editTodo ? editFormData.name : todo
     );
-    setCurrentUser({ ...currentUser, todos: newTodos });
+    const newUserDetail = { ...currentUser, todos: newTodos };
+    const newFakeUserData = [
+      ...fakeUserData.filter((fakeUser) => fakeUser.username !== currentUser.username),
+      newUserDetail,
+    ];
+    setFakeUserData(newFakeUserData);
+    setCurrentUser(newUserDetail);
     setEditFormData(initialAddFormData);
     toggleModal();
   };
@@ -34,6 +41,10 @@ function EditTodoModal() {
       [name]: value,
     });
   };
+
+  useEffect(() => {
+    if (editTodo) setEditFormData({ name: editTodo });
+  }, [setEditFormData, editTodo]);
 
   if (!showEditModal) return null;
 
@@ -50,7 +61,7 @@ function EditTodoModal() {
               type='text'
               id='name'
               name='name'
-              value={editFormData.name || editTodo}
+              value={editFormData.name}
               onChange={handleChange}
               className='w-full px-3 py-2 border border-gray-500 rounded-md focus:outline-none focus:border-blue-500'
               required
@@ -60,9 +71,9 @@ function EditTodoModal() {
           <div className='flex justify-end'>
             <button
               type='submit'
-              className='bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md focus:outline-none'
+              className='bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md focus:outline-none'
             >
-              Add
+              Save
             </button>
             <button
               type='button'

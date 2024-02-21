@@ -1,16 +1,17 @@
-"use client";
-import { initialAddFormData } from "@/data/constants";
-import { userData } from "@/data/user";
-import { userAtom } from "@/lib/jotai/atom";
-import { useAtom } from "jotai";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import Add from "@/assets/heroicons/add.svg";
-import Image from "next/image";
+'use client';
+import { initialAddFormData } from '@/data/constants';
+import { userData } from '@/data/user';
+import { fakeUserDataAtom, userAtom } from '@/lib/jotai/atom';
+import { useAtom } from 'jotai';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import Add from '@/assets/heroicons/add.svg';
+import Image from 'next/image';
 
 export default function AddTodo() {
   const [showModal, setShowModal] = useState(false);
   const [currentUser, setCurrentUser] = useAtom(userAtom);
+  const [fakeUserData, setFakeUserData] = useAtom(fakeUserDataAtom);
   const [formData, setFormData] = useState<AddTodoFormData>(initialAddFormData);
   const router = useRouter();
 
@@ -28,9 +29,16 @@ export default function AddTodo() {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const user = userData.find((user) => user.username === currentUser.username);
-    if (!user) return router.push("/");
-    setCurrentUser({ ...currentUser, todos: [formData.name, ...currentUser.todos] });
+    const user = fakeUserData.find((user) => user.username === currentUser.username);
+    if (!user) return router.push('/');
+    const newUserDetail = { ...currentUser, todos: [formData.name, ...currentUser.todos] };
+    const newFakeUserData = [
+      ...fakeUserData.filter((fakeUser) => fakeUser.username !== currentUser.username),
+      newUserDetail,
+    ];
+
+    setFakeUserData(newFakeUserData);
+    setCurrentUser(newUserDetail);
     setFormData(initialAddFormData);
     toggleModal();
   };

@@ -1,11 +1,11 @@
-"use client";
-import React, { useEffect } from "react";
-import Trash from "@/assets/heroicons/trash.svg";
-import Edit from "@/assets/heroicons/edit.svg";
-import Image from "next/image";
-import { useAtom } from "jotai";
-import { editModalAtom, editTodoAtom, userAtom } from "@/lib/jotai/atom";
-import { useRouter } from "next/navigation";
+'use client';
+import React, { useEffect } from 'react';
+import Trash from '@/assets/heroicons/trash.svg';
+import Edit from '@/assets/heroicons/edit.svg';
+import Image from 'next/image';
+import { useAtom } from 'jotai';
+import { editModalAtom, editTodoAtom, fakeUserDataAtom, userAtom } from '@/lib/jotai/atom';
+import { useRouter } from 'next/navigation';
 
 export default function TodoList() {
   const [currentUser, setCurrentUser] = useAtom(userAtom);
@@ -13,9 +13,17 @@ export default function TodoList() {
   const [_, setEditTodo] = useAtom(editTodoAtom);
   const router = useRouter();
   const isAuthenticated = currentUser && currentUser.name;
+  const [fakeUserData, setFakeUserData] = useAtom(fakeUserDataAtom);
   const handleDelete = (AddToDo: any) => {
     const newTodos = currentUser.todos.filter((todo) => todo !== AddToDo);
-    setCurrentUser({ ...currentUser, todos: [...newTodos] });
+    const newUserDetail = { ...currentUser, todos: newTodos };
+
+    const newFakeUserData = [
+      ...fakeUserData.filter((fakeUser) => fakeUser.username !== currentUser.username),
+      newUserDetail,
+    ];
+    setFakeUserData(newFakeUserData);
+    setCurrentUser(newUserDetail);
   };
 
   const handleEdit = (editTodo: any) => {
@@ -24,7 +32,7 @@ export default function TodoList() {
   };
 
   useEffect(() => {
-    if (!isAuthenticated) router.push("/");
+    if (!isAuthenticated) router.push('/');
   }, [currentUser, router]);
 
   return (

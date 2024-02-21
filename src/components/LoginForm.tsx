@@ -1,15 +1,16 @@
-"use client";
-import { useRouter } from "next/navigation";
-import React, { useState } from "react";
-import { useAtom } from "jotai";
-import { userData } from "@/data/user";
-import { initialFormData } from "@/data/constants";
-import { userAtom } from "@/lib/jotai/atom";
+'use client';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react';
+import { useAtom } from 'jotai';
+import { userData } from '@/data/user';
+import { initialFormData } from '@/data/constants';
+import { fakeUserDataAtom, userAtom } from '@/lib/jotai/atom';
 
 const LoginForm: React.FC = () => {
   const [formData, setFormData] = useState<LoginFormData>(initialFormData);
-  const [isError, setIsError] = useState<string>("");
+  const [isError, setIsError] = useState<string>('');
   const [_, setCurrentUser] = useAtom(userAtom);
+  const [fakeUserData, setFakeUserData] = useAtom(fakeUserDataAtom);
   const router = useRouter();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -19,13 +20,13 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    const user = userData.find((user) => user.username === formData.username);
+    const user = fakeUserData.find((user) => user.username === formData.username);
     const isAuthenticated = user && user.password === formData.password;
 
-    if (!isAuthenticated) return setIsError("invalid credentials, please try again");
+    if (!isAuthenticated) return setIsError('invalid credentials, please try again');
     setFormData(initialFormData);
     setCurrentUser(user);
-    router.push("/todo");
+    router.push('/todo');
   };
 
   return (
