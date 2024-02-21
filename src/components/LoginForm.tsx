@@ -1,17 +1,15 @@
 "use client";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
-
-interface FormData {
-  username: string;
-  password: string;
-}
+import { useAtom } from "jotai";
+import { userData } from "@/data/user";
+import { initialFormData } from "@/data/constants";
+import { userAtom } from "@/lib/jotai/atom";
 
 const LoginForm: React.FC = () => {
-  const [formData, setFormData] = useState<FormData>({
-    username: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState<LoginFormData>(initialFormData);
+  const [isError, setIsError] = useState<string>("");
+  const [_, setCurrentUser] = useAtom(userAtom);
   const router = useRouter();
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>): void => {
@@ -21,12 +19,17 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>): void => {
     event.preventDefault();
-    console.log(formData);
+    const user = userData.find((user) => user.username === formData.username);
+    const isAuthenticated = user && user.password === formData.password;
+
+    if (!isAuthenticated) return setIsError("invalid credentials, please try again");
+    setFormData(initialFormData);
+    setCurrentUser(user);
     router.push("/todo");
   };
 
   return (
-    <form onSubmit={handleSubmit} className='max-w-sm mx-auto p-4 bg-white shadow-md rounded-md '>
+    <form onSubmit={handleSubmit} className='w-1/4 mx-auto p-4 bg-white shadow-md rounded-md '>
       <h2 className='text-lg font-semibold mb-4'>Login</h2>
       <label htmlFor='username' className='block mb-2'>
         Username:
@@ -53,6 +56,8 @@ const LoginForm: React.FC = () => {
         required
         className='w-full px-3 py-2 mb-4 border rounded-md focus:outline-none focus:border-blue-500'
       />
+
+      {isError && <span className='bg-red-300 text-black p-2 text-xs my-2 block'>{isError}</span>}
 
       <button
         type='submit'
