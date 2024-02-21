@@ -6,11 +6,10 @@ import Image from "next/image";
 import { useAtom } from "jotai";
 import { editModalAtom, editTodoAtom, userAtom } from "@/lib/jotai/atom";
 import { useRouter } from "next/navigation";
-import { userData } from "@/data/user";
 
 export default function TodoList() {
   const [currentUser, setCurrentUser] = useAtom(userAtom);
-  const [showEditModal, setShowEditModal] = useAtom(editModalAtom);
+  const [_showEditModal, setShowEditModal] = useAtom(editModalAtom);
   const [_, setEditTodo] = useAtom(editTodoAtom);
   const router = useRouter();
   const handleDelete = (AddToDo: any) => {
@@ -23,9 +22,9 @@ export default function TodoList() {
     setShowEditModal(true);
   };
 
-  useEffect(() => {
-    if (!currentUser.name) router.push("/");
-  }, [currentUser]);
+  // useEffect(() => {
+  // if (!(currentUser && currentUser.name)) router.push("/");
+  // }, [currentUser, router]);
 
   return (
     <>
