@@ -1,4 +1,4 @@
-# FriendGer
+# Todo List App
 
 Link : https://todo-ola-nextjs.vercel.app/todo
 
